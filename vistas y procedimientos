@@ -1,0 +1,258 @@
+7. Debe generar 10 vistas por cada Base de datos (Las vistas pueden ser tomadas de los comandos sql ya desarrollados)
+
+   
+
+   1. Vista de productos con su proveedor:
+
+   ```sql
+   CREATE VIEW Vista_Productos_Y_Proveedores AS
+   SELECT p.id_producto, p.nombre AS nombre_producto, pr.nombre AS nombre_proveedor
+   FROM producto p
+   INNER JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor;
+   
+   ```
+
+   2. Vista de detalles de pedido con información de producto y cliente:
+
+   ```sql
+   CREATE VIEW Vista_Detalles_Pedido AS
+   SELECT dp.id_detalle, p.nombre AS nombre_producto, c.id_cliente, c.limite_credito
+   FROM detalle_pedido dp
+   INNER JOIN producto p ON dp.id_producto = p.id_producto
+   INNER JOIN pedido pd ON dp.id_pedido = pd.id_pedido
+   INNER JOIN cliente c ON pd.id_cliente = c.id_cliente;
+   
+   ```
+
+   3. Vista de clientes y sus pedidos:
+
+   ```sql
+   CREATE VIEW Vista_Clientes_Y_Pedidos AS
+   SELECT c.id_cliente, c.limite_credito, COUNT(p.id_pedido) AS total_pedidos
+   FROM cliente c
+   LEFT JOIN pedido p ON c.id_cliente = p.id_cliente
+   GROUP BY c.id_cliente, c.limite_credito;
+   
+   ```
+
+   4. Vista de empleados y sus jefes:
+
+   ```sql
+   CREATE VIEW Vista_Empleados_Y_Jefes AS
+   SELECT e.id_empleado, e.puesto, j.nombre AS nombre_jefe
+   FROM empleado e
+   LEFT JOIN jefe j ON e.id_jefe = j.id_jefe;
+   
+   ```
+
+   5. Vista de stock de productos:
+
+   ```sql
+   CREATE VIEW Vista_Stock_Productos AS
+   SELECT p.nombre AS nombre_producto, s.stock_actual, s.stock_maximo, s.stock_minimo
+   FROM producto p
+   INNER JOIN stock s ON p.id_producto = s.id_stock;
+   
+   ```
+
+   6. Vista de detalles de pagos por cliente:
+
+   ```sql
+   CREATE VIEW Vista_Detalles_Pagos_Cliente AS
+   SELECT pg.id_pago, c.id_cliente, c.limite_credito, pg.monto_total, pg.metodo_pago
+   FROM pago pg
+   INNER JOIN cliente c ON pg.id_cliente = c.id_cliente;
+   
+   ```
+
+   7. Vista de pedidos pendientes:
+
+   ```sql
+   CREATE VIEW Vista_Pedidos_Pendientes AS
+   SELECT p.id_pedido, p.estado, p.comentarios
+   FROM pedido p
+   WHERE p.estado = 'Pendiente';
+   
+   ```
+
+   8. Vista de regiones y sus países:
+
+   ```sql
+   CREATE VIEW Vista_Regiones_Y_Paises AS
+   SELECT r.nombre_region, p.nombre_pais
+   FROM region r
+   INNER JOIN pais p ON r.id_region = p.id_pais;
+   
+   ```
+
+   9. Vista de productos con precio de venta:
+
+   ```sql
+   CREATE VIEW Vista_Productos_Con_Precio AS
+   SELECT p.nombre AS nombre_producto, pr.precio_venta
+   FROM producto p
+   INNER JOIN precio pr ON p.id_precio = pr.id_precio;
+   
+   ```
+
+   10. Vista de productos con descripción HTML:
+
+   ```sql
+   CREATE VIEW Vista_Productos_Descripcion_HTML AS
+   SELECT p.nombre AS nombre_producto, g.descripcion_html
+   FROM producto p
+   INNER JOIN gama_producto g ON p.id_gama = g.id_gama;
+   
+   ```
+
+8. Debe generar 10 procedimientos almacenados por cada base de datos. Los procedimientos deben incluir procesos de Crear, Actualizar, eliminar o buscar.
+
+1. Procedimiento para crear un nuevo producto:
+
+```sql
+CREATE PROCEDURE Crear_Producto(
+    IN p_nombre VARCHAR(70),
+    IN p_id_gama VARCHAR(20),
+    IN p_id_dimensiones INT,
+    IN p_id_proveedor INT,
+    IN p_descripcion TEXT,
+    IN p_id_precio INT
+)
+BEGIN
+    INSERT INTO producto (nombre, id_gama, id_dimensiones, id_proveedor, descripcion, id_precio)
+    VALUES (p_nombre, p_id_gama, p_id_dimensiones, p_id_proveedor, p_descripcion, p_id_precio);
+END;
+
+```
+
+2. Procedimiento para actualizar información de un cliente:
+
+```sql
+CREATE PROCEDURE Actualizar_Info_Cliente(
+    IN p_id_cliente INT,
+    IN p_limite_credito DECIMAL(15,2)
+)
+BEGIN
+    UPDATE cliente
+    SET limite_credito = p_limite_credito
+    WHERE id_cliente = p_id_cliente;
+END;
+
+```
+
+3. Procedimiento para eliminar un detalle de pedido:
+
+```sql
+CREATE PROCEDURE Eliminar_Detalle_Pedido(
+    IN p_id_detalle INT
+)
+BEGIN
+    DELETE FROM detalle_pedido
+    WHERE id_detalle = p_id_detalle;
+END;
+
+```
+
+4. Procedimiento para crear un nuevo empleado:
+
+```sql
+CREATE PROCEDURE Crear_Empleado(
+    IN p_id_jefe INT,
+    IN p_id_oficina INT,
+    IN p_puesto VARCHAR(50),
+    IN p_id_contacto INT,
+    IN p_id_persona INT
+)
+BEGIN
+    INSERT INTO empleado (id_jefe, id_oficina, puesto, id_contacto, id_persona)
+    VALUES (p_id_jefe, p_id_oficina, p_puesto, p_id_contacto, p_id_persona);
+END;
+
+```
+
+5. Procedimiento para actualizar el precio de un producto:
+
+```sql
+CREATE PROCEDURE Actualizar_Precio_Producto(
+    IN p_id_producto INT,
+    IN p_nuevo_precio DECIMAL(15,2)
+)
+BEGIN
+    UPDATE precio
+    SET precio_venta = p_nuevo_precio
+    WHERE id_producto = p_id_producto;
+END;
+
+```
+
+6. Procedimiento para eliminar un pago:
+
+```sql
+CREATE PROCEDURE Eliminar_Pago(
+    IN p_id_pago INT
+)
+BEGIN
+    DELETE FROM pago
+    WHERE id_pago = p_id_pago;
+END;
+
+```
+
+7. Procedimiento para buscar un pedido por cliente:
+
+```sql
+CREATE PROCEDURE Buscar_Pedido_Por_Cliente(
+    IN p_id_cliente INT
+)
+BEGIN
+    SELECT *
+    FROM pedido
+    WHERE id_cliente = p_id_cliente;
+END;
+
+```
+
+8. Procedimiento para crear un nuevo pedido:
+
+```sql
+CREATE PROCEDURE Crear_Pedido(
+    IN p_id_fecha INT,
+    IN p_id_cliente INT,
+    IN p_estado VARCHAR(15),
+    IN p_comentarios TEXT
+)
+BEGIN
+    INSERT INTO pedido (id_fecha, id_cliente, estado, comentarios)
+    VALUES (p_id_fecha, p_id_cliente, p_estado, p_comentarios);
+END;
+
+```
+
+9. Procedimiento para actualizar la descripción HTML de un producto:
+
+```sql
+CREATE PROCEDURE Actualizar_Descripcion_HTML_Producto(
+    IN p_id_producto INT,
+    IN p_nueva_descripcion_html TEXT
+)
+BEGIN
+    UPDATE gama_producto
+    SET descripcion_html = p_nueva_descripcion_html
+    WHERE id_producto = p_id_producto;
+END;
+
+```
+
+10. Procedimiento para buscar empleados por puesto:
+
+```sql
+CREATE PROCEDURE Buscar_Empleados_Por_Puesto(
+    IN p_puesto VARCHAR(50)
+)
+BEGIN
+    SELECT *
+    FROM empleado
+    WHERE puesto = p_puesto;
+END;
+
+```
